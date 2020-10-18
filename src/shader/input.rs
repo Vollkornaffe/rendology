@@ -285,6 +285,22 @@ pub trait StaticUniformType {
     const TYPE: UniformType;
 }
 
+impl StaticUniformType for i32 {
+    const TYPE: UniformType = UniformType::Int;
+}
+
+impl StaticUniformType for u32 {
+    const TYPE: UniformType = UniformType::UnsignedInt;
+}
+
+impl StaticUniformType for i64 {
+    const TYPE: UniformType = UniformType::Int64;
+}
+
+impl StaticUniformType for u64 {
+    const TYPE: UniformType = UniformType::UnsignedInt64;
+}
+
 impl StaticUniformType for bool {
     const TYPE: UniformType = UniformType::Bool;
 }
