@@ -1,10 +1,6 @@
-pub use crate::CreationError;
-use crate::{
-    Drawable,
-    DrawError,
-    InstancingMode,
-};
 use crate::shader::ToUniforms;
+pub use crate::CreationError;
+use crate::{DrawError, Drawable, InstancingMode};
 
 pub enum IndexBuffer {
     IndexBuffer(glium::index::IndexBuffer<u32>),
@@ -47,7 +43,6 @@ impl<V> Drawable<(), V> for Mesh<V>
 where
     V: glium::vertex::Vertex,
 {
-
     const INSTANCING_MODE: InstancingMode = InstancingMode::Uniforms;
 
     fn draw<U, S>(
@@ -73,5 +68,4 @@ where
 
         Ok(())
     }
-
 }

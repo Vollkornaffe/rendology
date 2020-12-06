@@ -99,31 +99,21 @@ fn main() {
     simple_logger::init_with_level(log::Level::Info).unwrap();
 
     // Initialize glium
-    let mut events_loop = glutin::EventsLoop::new();
+    let mut event_loop = glutin::event_loop::EventLoop::new();
     let display = {
-        let window_builder = glutin::WindowBuilder::new()
-            .with_dimensions(WINDOW_SIZE.into())
+        let window_builder = glutin::window::WindowBuilder::new()
+            .with_inner_size(glutin::dpi::PhysicalSize::new(WINDOW_SIZE.0, WINDOW_SIZE.1))
             .with_title("Rendology example: Cube");
         let context_builder = glutin::ContextBuilder::new();
-        glium::Display::new(window_builder, context_builder, &events_loop).unwrap()
+        glium::Display::new(window_builder, context_builder, &event_loop).unwrap()
     };
 
     // Initialize rendology pipeline
     let mut pipeline = Pipeline::create(&display, &Default::default()).unwrap();
 
     let start_time = Instant::now();
-    let mut quit = false;
-    while !quit {
-        events_loop.poll_events(|event| {
-            if let glutin::Event::WindowEvent {
-                event: glutin::WindowEvent::CloseRequested,
-                ..
-            } = event
-            {
-                quit = true;
-            }
-        });
 
+    event_loop.run(move |ev, _, control_flow| {
         let time = start_time.elapsed().as_fractional_secs() as f32;
         let scene = scene(time);
 
@@ -135,7 +125,22 @@ fn main() {
             .unwrap();
 
         target.finish().unwrap();
-    }
+
+        let next_frame_time =
+            std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
+
+        *control_flow = glutin::event_loop::ControlFlow::WaitUntil(next_frame_time);
+        match ev {
+            glutin::event::Event::WindowEvent { event, .. } => match event {
+                glutin::event::WindowEvent::CloseRequested => {
+                    *control_flow = glutin::event_loop::ControlFlow::Exit;
+                    return;
+                }
+                _ => return,
+            },
+            _ => (),
+        }
+    });
 }
 
 fn scene(time: f32) -> Scene {
